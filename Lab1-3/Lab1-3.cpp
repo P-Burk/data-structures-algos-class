@@ -63,7 +63,7 @@ bidInfo getBid() {
     getline(cin, userBid.bidTitle);
 
     cout << "Enter fund: ";
-    getline(cin, userBid.fundType); //changed input stream to getline() in case fund has spaces
+    cin >> userBid.fundType;
 
     cout << "Enter vehicle: ";
     cin.ignore();
