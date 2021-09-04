@@ -15,27 +15,25 @@ using namespace std;
 // Global definitions visible to all methods and classes
 //============================================================================
 
-// FIXME (1): Define a data structure to hold bid information together as a single unit of storage.
+// bidInfo struct to hold data pertaining to each bid
 struct bidInfo{
     string bidTitle;
     string fundType;
     string vehicleType;
-    double bidAmount;
+    double bidAmount = 0.0;
 };
 
-// FIXME (4): Display the bid values passed in data structure
 /**
  * Display the bid information
  *
- * @param ?type? data structure containing the bid info
+ * @param bidInfo data structure containing the bid info
  */
 void displayBid(bidInfo userBid) {
     cout << "Title: " << userBid.bidTitle << endl;
     cout << "Fund: " << userBid.fundType << endl;
     cout << "Vehicle: " << userBid.vehicleType << endl;
     cout << "Bid Amount: " << userBid.bidAmount << endl;
-
-    return;
+    cout << endl;
 }
 
 /**
@@ -46,13 +44,12 @@ void displayBid(bidInfo userBid) {
  *
  * @param ch The character to strip out
  */
+ // moved this function due to compile error in getBid.getBid() was calling strToDouble before it was declared.
 double strToDouble(string str, char ch) {
     str.erase(remove(str.begin(), str.end(), ch), str.end());
     return atof(str.c_str());
 }
 
-
-// FIXME (3): Store input values in data structure
 /**
  * Prompt user for bid information
  *
@@ -66,7 +63,7 @@ bidInfo getBid() {
     getline(cin, userBid.bidTitle);
 
     cout << "Enter fund: ";
-    cin >> userBid.fundType;
+    getline(cin, userBid.fundType); //changed input stream to getline() in case fund has spaces
 
     cout << "Enter vehicle: ";
     cin.ignore();
@@ -86,8 +83,6 @@ bidInfo getBid() {
  * The one and only main() method
  */
 int main() {
-
-    // FIXME (2): Declare instance of data structure to hold bid information
 	bidInfo userBid1;
 
     // loop to display menu until exit chosen
@@ -99,8 +94,9 @@ int main() {
         cout << "  9. Exit" << endl;
         cout << "Enter choice: ";
         cin >> choice;
+        cout << endl;
 
-        // FIXME (5): Complete the method calls then test the program
+        // take action on user input
         switch (choice) {
             case 1:
             	userBid1 = getBid();
@@ -108,6 +104,8 @@ int main() {
             case 2:
                 displayBid(userBid1);
                 break;
+            default:        // added default just as "best practice"
+                continue;
         }
     }
 
