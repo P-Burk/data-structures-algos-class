@@ -16,7 +16,12 @@ using namespace std;
 //============================================================================
 
 // FIXME (1): Define a data structure to hold bid information together as a single unit of storage.
-?type?
+struct bidInfo{
+    string bidTitle;
+    string fundType;
+    string vehicleType;
+    double bidAmount;
+};
 
 // FIXME (4): Display the bid values passed in data structure
 /**
@@ -24,42 +29,13 @@ using namespace std;
  *
  * @param ?type? data structure containing the bid info
  */
-void displayBid(?type? ?variable?) {
-    cout << "Title: " << ?variable? << endl;
-    cout << "Fund: " << ?variable? << endl;
-    cout << "Vehicle: " << ?variable? << endl;
-    cout << "Bid Amount: " << ?variable? << endl;
+void displayBid(bidInfo userBid) {
+    cout << "Title: " << userBid.bidTitle << endl;
+    cout << "Fund: " << userBid.fundType << endl;
+    cout << "Vehicle: " << userBid.vehicleType << endl;
+    cout << "Bid Amount: " << userBid.bidAmount << endl;
 
     return;
-}
-
-// FIXME (3): Store input values in data structure
-/**
- * Prompt user for bid information
- *
- * @return data structure containing the bid info
- */
-?retval? getBid() {
-    ?type? ?variable?;
-
-    cout << "Enter title: ";
-    cin.ignore();
-    getline(cin, ?variable?);
-
-    cout << "Enter fund: ";
-    cin >> ?variable?;
-
-    cout << "Enter vehicle: ";
-    cin.ignore();
-    getline(cin, ?variable?);
-
-    cout << "Enter amount: ";
-    cin.ignore();
-    string strAmount;
-    getline(cin, strAmount);
-    ?variable? = strToDouble(strAmount, '$');
-
-    return ?retval?;
 }
 
 /**
@@ -76,13 +52,43 @@ double strToDouble(string str, char ch) {
 }
 
 
+// FIXME (3): Store input values in data structure
+/**
+ * Prompt user for bid information
+ *
+ * @return data structure containing the bid info
+ */
+bidInfo getBid() {
+    bidInfo userBid;
+
+    cout << "Enter title: ";
+    cin.ignore();
+    getline(cin, userBid.bidTitle);
+
+    cout << "Enter fund: ";
+    cin >> userBid.fundType;
+
+    cout << "Enter vehicle: ";
+    cin.ignore();
+    getline(cin, userBid.vehicleType);
+
+    cout << "Enter amount: ";
+    cin.ignore();
+    string strAmount;
+    getline(cin, strAmount);
+    userBid.bidAmount = strToDouble(strAmount, '$');
+
+    return userBid;
+}
+
+
 /**
  * The one and only main() method
  */
 int main() {
 
     // FIXME (2): Declare instance of data structure to hold bid information
-	?type? ?variable?
+	bidInfo userBid1;
 
     // loop to display menu until exit chosen
     int choice = 0;
@@ -97,10 +103,10 @@ int main() {
         // FIXME (5): Complete the method calls then test the program
         switch (choice) {
             case 1:
-            	?variable? = getBid();
+            	userBid1 = getBid();
                 break;
             case 2:
-                displayBid(?variable?);
+                displayBid(userBid1);
                 break;
         }
     }
