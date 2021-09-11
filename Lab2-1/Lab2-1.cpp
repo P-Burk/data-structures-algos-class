@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : Lab2-2.cpp
-// Author      : Your Name
+// Author      : Preston Burkhardt
 // Version     : 1.0
 // Copyright   : Copyright © 2017 SNHU COCE
 // Description : Lab 2-2 Up to Speed in C++, Part 2
@@ -11,6 +11,7 @@
 #include <time.h>
 
 // FIXME (1): Reference the CSVParser library
+#include "CSVparser.hpp"  // is this correct??
 
 using namespace std;
 
@@ -76,8 +77,8 @@ Bid getBid() {
  */
 ?retval? loadBids(string csvPath) {
 	// FIXME (2): Define a vector data structure to hold a collection of bids.
-
-    ?type? ?variable?;
+    // define vector to hold bids
+    vector<int> bidHolder;
 
     // initialize the CSV Parser using the given path
     csv::Parser file = csv::Parser(csvPath);
