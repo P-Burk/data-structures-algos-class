@@ -8,10 +8,11 @@
 
 #include <algorithm>
 #include <iostream>
+#include <utility>
 #include <time.h>
 
 // FIXME (1): Reference the CSVParser library
-#include "CSVparser.hpp"  // is this correct??
+#include "CSVparser.hpp"
 
 using namespace std;
 
@@ -29,6 +30,13 @@ struct Bid {
     Bid() {
         amount = 0.0;
     }
+    //added constructor with 3 arguments in order to fully construct a Bid object
+    Bid(string bidTitle, string bidFund, double bidAmount) {
+        title = move(bidTitle);
+        fund = move(bidFund);
+        amount = bidAmount;
+    }
+
 };
 
 //============================================================================
@@ -75,19 +83,33 @@ Bid getBid() {
  * @param csvPath the path to the CSV file to load
  * @return a container holding all the bids read
  */
-?retval? loadBids(string csvPath) {
+vector<Bid> loadBids(string csvPath) {
 	// FIXME (2): Define a vector data structure to hold a collection of bids.
-    // define vector to hold bids
-    vector<int> bidHolder;
+    // vector to hold all bids for output
+    vector<Bid> holdBids;
 
     // initialize the CSV Parser using the given path
     csv::Parser file = csv::Parser(csvPath);
 
 	// loop to read rows of a CSV file
+    // reads CSV file, initializes currentBid with bid info, adds current bid to vector for output
 	for (int i = 0; i < file.rowCount(); i++) {
         // FIXME (3): create a data structure to hold data from each row and add to vector
+        // can use declaration + constructor OR declare + define each attribute
+        // comment out one or the other. can't run both at same time
+
+        Bid currentBid = {file[i][0], file[i][8], strToDouble(file[i][4], '$')};
+/*
+        Bid currentBid;
+        currentBid.title = file[i][0];
+        currentBid.fund = file[i][8];
+        currentBid.amount = strToDouble(file[i][4], '$');
+*/
+
+        holdBids.push_back(currentBid);
     }
-    return ?variable?;
+    cout << file.rowCount() << " bids read." << endl;
+    return holdBids;
 }
 
 /**
@@ -115,14 +137,17 @@ int main(int argc, char* argv[]) {
         csvPath = argv[1];
         break;
     default:
+        // had to add the full path to the CSV file for my code to work
         csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
     }
 
     // FIXME (4): Define a vector to hold all the bids
-    ?type? ?variable?;
+    // vector to hold all of the bids
+    vector<Bid> holdAllBids;
 
     // FIXME (7a): Define a timer variable
-    ?type? ?variable?;
+    //variable for calculating run time
+    double timerVariable;
 
     int choice = 0;
     while (choice != 9) {
@@ -141,16 +166,22 @@ int main(int argc, char* argv[]) {
             break;
         case 2:
             // FIXME (7b): Initialize a timer variable before loading bids
+            timerVariable = clock();
 
             // FIXME (5): Complete the method call to load the bids
+            holdAllBids = loadBids(csvPath);
 
             // FIXME (7c): Calculate elapsed time and display result
+            timerVariable = clock() - timerVariable;
+            cout << "Time: " << timerVariable << " milliseconds." << endl;
+            cout << "Time: " << (timerVariable * 0.001) << " seconds." << endl;
 
             break;
         case 3:
             // FIXME (6): Loop and display the bids read
-            for (int i = 0; i < ?variable?.?length?; ++i) {
-            	displayBid(?variable?);
+            // loops through all of the bids in holdAllBidsVector and displays each
+            for (int i = 0; i < holdAllBids.size(); ++i) {
+            	displayBid(holdAllBids.at(i));
             }
             cout << endl;
 
