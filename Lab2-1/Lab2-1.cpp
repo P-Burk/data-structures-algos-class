@@ -11,7 +11,7 @@
 #include <time.h>
 
 // FIXME (1): Reference the CSVParser library
-#include "CSVparser.hpp"  // is this correct??
+#include "CSVparser.hpp"
 
 using namespace std;
 
@@ -75,10 +75,9 @@ Bid getBid() {
  * @param csvPath the path to the CSV file to load
  * @return a container holding all the bids read
  */
-?retval? loadBids(string csvPath) {
+vector<Bid> loadBids(string csvPath) {
 	// FIXME (2): Define a vector data structure to hold a collection of bids.
-    // define vector to hold bids
-    vector<int> bidHolder;
+    vector<Bid> holdBids;
 
     // initialize the CSV Parser using the given path
     csv::Parser file = csv::Parser(csvPath);
@@ -87,7 +86,7 @@ Bid getBid() {
 	for (int i = 0; i < file.rowCount(); i++) {
         // FIXME (3): create a data structure to hold data from each row and add to vector
     }
-    return ?variable?;
+    return holdBids;
 }
 
 /**
