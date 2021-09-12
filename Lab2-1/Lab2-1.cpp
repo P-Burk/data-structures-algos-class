@@ -97,8 +97,8 @@ vector<Bid> loadBids(string csvPath) {
         // FIXME (3): create a data structure to hold data from each row and add to vector
         // can use declaration + constructor OR declare + define each attribute
         // comment out one or the other. can't run both at same time
-        Bid currentBid = {file[i][0], file[i][8], strToDouble(file[i][4], '$')};
 
+        Bid currentBid = {file[i][0], file[i][8], strToDouble(file[i][4], '$')};
 /*
         Bid currentBid;
         currentBid.title = file[i][0];
@@ -138,8 +138,7 @@ int main(int argc, char* argv[]) {
         break;
     default:
         // had to add the full path to the CSV file for my code to work
-        //csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
-        csvPath = R"(C:\Users\prest\Google Drive\College Classes\CS-260 Data Structures and Algorithms\Code-and-projects\data-structures-algos-class\Lab2-1\eBid_Monthly_Sales_Dec_2016.csv)";
+        csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
     }
 
     // FIXME (4): Define a vector to hold all the bids
