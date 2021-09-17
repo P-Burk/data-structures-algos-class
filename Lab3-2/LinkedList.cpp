@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : LinkedList.cpp
-// Author      : Your Name
+// Author      : Preston Burkhardt
 // Version     : 1.0
 // Copyright   : Copyright © 2017 SNHU COCE
 // Description : Lab 3-3 Lists and Searching
@@ -222,7 +222,9 @@ int main(int argc, char* argv[]) {
         bidKey = argv[2];
         break;
     default:
-        csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
+        //need to specify specific path on my PC or program won't find the csv
+        //csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
+        csvPath = R"(C:\Users\prest\Google Drive\College Classes\CS-260 Data Structures and Algorithms\Code-and-projects\data-structures-algos-class\Lab3-2\eBid_Monthly_Sales_Dec_2016.csv)";
         bidKey = "98109";
     }
 
