@@ -43,7 +43,7 @@ struct Bid {
 class LinkedList {
 
 private:
-    // FIXME (1): Internal structure for list entries, housekeeping variables/*/**/*/
+    // FIXME (1): Internal structure for list entries, housekeeping variables
 
     //node to hold each bid in the linked list
     struct bidNode {
@@ -110,6 +110,7 @@ string LinkedList::printBid(Bid bid) {
  */
 void LinkedList::Append(Bid bid) {
     // FIXME (3): Implement append logic
+
     //create new bidNode
     bidNode *newNode = new bidNode(bid);
 
@@ -187,7 +188,6 @@ void LinkedList::Remove(string bidId) {
         //branch for if the removed node is the head node
         if (this->currNode->bid.bidId == bidId && this->currNode == this->headNode) {
             this->headNode = this->headNode->nextNode;
-            cout << "DELETED: " << printBid(this->currNode->bid) << endl;
             delete this->currNode;
             break;
         }
@@ -196,7 +196,6 @@ void LinkedList::Remove(string bidId) {
         else if (this->currNode->bid.bidId == bidId && this->currNode == this->tailNode) {
             this->tailNode = this->prevNode;
             this->prevNode->nextNode = nullptr;
-            cout << "DELETED: " << printBid(this->currNode->bid) << endl;
             delete this->currNode;
             break;
         }
@@ -211,7 +210,6 @@ void LinkedList::Remove(string bidId) {
         //sets the previous node's nextNode to current node's nextNode then deletes current node
         else {
             this->prevNode->nextNode = this->currNode->nextNode;
-            cout << "DELETED: " << printBid(this->currNode->bid) << endl;
             delete this->currNode;
             break;
         }
@@ -434,14 +432,7 @@ int main(int argc, char* argv[]) {
             break;
 
         case 5:
-            //TODO: uncomment before turning in
-            //bidList.Remove(bidKey);
-
-            //code to select bids by bidID for removal
-            string bidToDelete;
-            cout << "Enter Bid ID: ";
-            cin >> bidToDelete;
-            bidList.Remove(bidToDelete);
+            bidList.Remove(bidKey);
             break;
         }
     }
