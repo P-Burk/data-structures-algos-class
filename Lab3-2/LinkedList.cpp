@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : LinkedList.cpp
-// Author      : Your Name
+// Author      : Preston Burkhardt
 // Version     : 1.0
 // Copyright   : Copyright © 2017 SNHU COCE
 // Description : Lab 3-3 Lists and Searching
@@ -45,6 +45,33 @@ class LinkedList {
 private:
     // FIXME (1): Internal structure for list entries, housekeeping variables
 
+    //node to hold each bid in the linked list
+    struct bidNode {
+        Bid bid;
+        bidNode *nextNode;
+        //default constuctor for bidNode
+        bidNode() {
+            nextNode = nullptr;
+        };
+        //constuctor with a bid passed in
+        bidNode(Bid passedBid) {
+            this->bid = passedBid;
+            nextNode = nullptr;
+        };
+    };
+
+    //helper and navigation pointers
+    bidNode *headNode;
+    bidNode *tailNode;
+    bidNode *currNode;
+    bidNode *prevNode;
+
+    //for tracking list size
+    int size = 0;
+
+    //for printing bid info
+    string printBid(Bid bid);
+
 public:
     LinkedList();
     virtual ~LinkedList();
@@ -61,6 +88,10 @@ public:
  */
 LinkedList::LinkedList() {
     // FIXME (2): Initialize housekeeping variables
+    headNode = nullptr;
+    tailNode = nullptr;
+    currNode = nullptr;
+    prevNode = nullptr;
 }
 
 /**
@@ -69,11 +100,32 @@ LinkedList::LinkedList() {
 LinkedList::~LinkedList() {
 }
 
+//prints bid info for specific bid
+string LinkedList::printBid(Bid bid) {
+    return bid.bidId + ": " + bid.title + " | " + to_string(bid.amount) + " | " + bid.fund;
+}
+
 /**
  * Append a new bid to the end of the list
  */
 void LinkedList::Append(Bid bid) {
     // FIXME (3): Implement append logic
+
+    //create new bidNode
+    bidNode *newNode = new bidNode(bid);
+
+    //assign the newNode as head and tail if no head exists
+    if (this->headNode == nullptr) {
+        this->headNode = newNode;
+        this->tailNode = newNode;
+    }
+    //assigns the nextNode pointer of the current tail node to the new node and sets the tail as that node
+    else {
+        this->tailNode->nextNode = newNode;
+        this->tailNode = newNode;
+    }
+    // increment size tracker
+    size++;
 }
 
 /**
@@ -81,6 +133,22 @@ void LinkedList::Append(Bid bid) {
  */
 void LinkedList::Prepend(Bid bid) {
     // FIXME (4): Implement prepend logic
+
+    //create new bidNode
+    bidNode *newNode = new bidNode(bid);
+
+    //assign as head and tail if no head exists
+    if (this->headNode == nullptr) {
+        this->headNode = newNode;
+        this->tailNode = newNode;
+    }
+    //assigns new node's nextNode pointer to the current head node, then tags the new node as the head node
+    else {
+        newNode->nextNode = this->headNode;
+        this->headNode = newNode;
+    }
+    // increment size tracker
+    size++;
 }
 
 /**
@@ -88,6 +156,19 @@ void LinkedList::Prepend(Bid bid) {
  */
 void LinkedList::PrintList() {
     // FIXME (5): Implement print logic
+
+    //sets current node as the head node
+    this->currNode = this->headNode;
+
+    //iterates through all the nodes until this->currNode is assigned null
+    //prints bid info for each node
+    while (this->currNode != nullptr) {
+        cout << this->currNode->bid.bidId << ": " << this->currNode->bid.title << " | " << this->currNode->bid.amount
+             << " | " << this->currNode->bid.fund << endl;
+        this->currNode = this->currNode->nextNode;
+    }
+    //reset this->currNode to null
+    this->currNode = nullptr;
 }
 
 /**
@@ -97,6 +178,49 @@ void LinkedList::PrintList() {
  */
 void LinkedList::Remove(string bidId) {
     // FIXME (6): Implement remove logic
+
+    //set current node to head node
+    this->currNode = this->headNode;
+
+    //iterate through list until current node is a null pointer
+    while (this->currNode != nullptr) {
+
+        //branch for if the removed node is the head node
+        if (this->currNode->bid.bidId == bidId && this->currNode == this->headNode) {
+            this->headNode = this->headNode->nextNode;
+            delete this->currNode;
+            break;
+        }
+
+        //branch for if the removed node is the tail node
+        else if (this->currNode->bid.bidId == bidId && this->currNode == this->tailNode) {
+            this->tailNode = this->prevNode;
+            this->prevNode->nextNode = nullptr;
+            delete this->currNode;
+            break;
+        }
+
+        //moves previous node to the current node and current node to the next node
+        else if (this->currNode->bid.bidId != bidId) {
+            this->prevNode = this->currNode;
+            this->currNode = this->currNode->nextNode;
+        }
+
+        //branch for when the removed node is found within the list
+        //sets the previous node's nextNode to current node's nextNode then deletes current node
+        else {
+            this->prevNode->nextNode = this->currNode->nextNode;
+            delete this->currNode;
+            break;
+        }
+    }
+
+    //reset current node and previous node to null and decrement size
+    this->currNode = nullptr;
+    this->prevNode = nullptr;
+
+    //decrement size counter
+    size--;
 }
 
 /**
@@ -106,6 +230,24 @@ void LinkedList::Remove(string bidId) {
  */
 Bid LinkedList::Search(string bidId) {
     // FIXME (7): Implement search logic
+
+    //set current node to head node
+    this->currNode = this->headNode;
+
+    //iterate through list until current node is null
+    while (this->currNode != nullptr) {
+
+        //if the current node bidID == argument bidID, return that bid
+        //Otherwise increment currNode to the next node
+        if (this->currNode->bid.bidId == bidId) {
+            return this->currNode->bid;
+        }
+        else {
+            this->currNode = this->currNode->nextNode;
+        }
+    }
+    //if no bid is found, empty bid is returned
+    return Bid();
 }
 
 /**
@@ -179,6 +321,7 @@ void loadBids(string csvPath, LinkedList *list) {
             bid.fund = file[i][8];
             bid.amount = strToDouble(file[i][4], '$');
 
+            //outputs bid info to ensure csv is being read properly
             //cout << bid.bidId << ": " << bid.title << " | " << bid.fund << " | " << bid.amount << endl;
 
             // add this bid to the end
@@ -290,7 +433,6 @@ int main(int argc, char* argv[]) {
 
         case 5:
             bidList.Remove(bidKey);
-
             break;
         }
     }
