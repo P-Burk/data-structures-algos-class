@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : VectorSorting.cpp
-// Author      : Your name
+// Author      : Preston Burkhardt
 // Version     : 1.0
 // Copyright   : Copyright © 2017 SNHU COCE
 // Description : Vector Sorting Algorithms
@@ -112,7 +112,6 @@ vector<Bid> loadBids(string csvPath) {
 }
 
 // FIXME (2a): Implement the quick sort logic over bid.title
-
 /**
  * Partition the vector of bids into two parts, low and high
  *
@@ -134,10 +133,12 @@ int partition(vector<Bid>& bids, int begin, int end) {
  * @param end the ending index to sort on
  */
 void quickSort(vector<Bid>& bids, int begin, int end) {
+
+
+
 }
 
-// FIXME (1a): Implement the selection sort logic over bid.title
-
+// FIXME (1a) COMPLETE: Implement the selection sort logic over bid.title
 /**
  * Perform a selection sort on bid title
  * Average performance: O(n^2))
@@ -147,6 +148,22 @@ void quickSort(vector<Bid>& bids, int begin, int end) {
  *            instance to be sorted
  */
 void selectionSort(vector<Bid>& bids) {
+    //outside loop
+    for (int i = 0; i < bids.size(); ++i) {
+
+        int indexSmallest = i;
+
+        //inside loop
+        for (int j = i + 1; j < bids.size(); ++j) {
+            if (bids[j].title < bids[indexSmallest].title) {
+                indexSmallest = j;
+            }
+        }
+        //swapping logic/actions
+        Bid temp = bids[i];
+        bids[i] = bids[indexSmallest];
+        bids[indexSmallest] = temp;
+    }
 }
 
 /**
@@ -174,7 +191,12 @@ int main(int argc, char* argv[]) {
         csvPath = argv[1];
         break;
     default:
+        //TODO: delete comments and big batch
+        //small batch
         csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
+
+        //big batch
+        //csvPath = "eBid_Monthly_Sales.csv";
     }
 
     // Define a vector to hold all the bids
@@ -195,36 +217,60 @@ int main(int argc, char* argv[]) {
         cin >> choice;
 
         switch (choice) {
+            case 1:
+                // Initialize a timer variable before loading bids
+                ticks = clock();
 
-        case 1:
-            // Initialize a timer variable before loading bids
-            ticks = clock();
+                // Complete the method call to load the bids
+                bids = loadBids(csvPath);
 
-            // Complete the method call to load the bids
-            bids = loadBids(csvPath);
+                cout << bids.size() << " bids read" << endl;
 
-            cout << bids.size() << " bids read" << endl;
+                // Calculate elapsed time and display result
+                ticks = clock() - ticks; // current clock ticks minus starting clock ticks
+                cout << "time: " << ticks << " clock ticks" << endl;
+                cout << "time: " << ticks * 1.0 / CLOCKS_PER_SEC << " seconds" << endl;
 
-            // Calculate elapsed time and display result
-            ticks = clock() - ticks; // current clock ticks minus starting clock ticks
-            cout << "time: " << ticks << " clock ticks" << endl;
-            cout << "time: " << ticks * 1.0 / CLOCKS_PER_SEC << " seconds" << endl;
+                break;
 
-            break;
+            case 2:
+                // Loop and display the bids read
+                for (int i = 0; i < bids.size(); ++i) {
+                    displayBid(bids[i]);
+                }
+                cout << endl;
 
-        case 2:
-            // Loop and display the bids read
-            for (int i = 0; i < bids.size(); ++i) {
-                displayBid(bids[i]);
-            }
-            cout << endl;
+                break;
 
-            break;
+            case 3:
+                // FIXME (1b) COMPLETE: Invoke the selection sort and report timing results
+                // Initialize a timer variable before loading bids
+                ticks = clock();
 
-        // FIXME (1b): Invoke the selection sort and report timing results
+                selectionSort(bids);
 
-        // FIXME (2b): Invoke the quick sort and report timing results
+                cout << bids.size() << " bids sorted" << endl;
 
+                // Calculate elapsed time and display result
+                ticks = clock() - ticks; // current clock ticks minus starting clock ticks
+                cout << "time: " << ticks << " clock ticks" << endl;
+                cout << "time: " << ticks * 1.0 / CLOCKS_PER_SEC << " seconds" << endl;
+                break;
+
+            case 4:
+                // FIXME (2b): Invoke the quick sort and report timing results
+                // Initialize a timer variable before loading bids
+                ticks = clock();
+
+                cout << "code the quick sort call" << endl;
+
+                cout << bids.size() << " bids sorted" << endl;
+
+                // Calculate elapsed time and display result
+                ticks = clock() - ticks; // current clock ticks minus starting clock ticks
+                cout << "time: " << ticks << " clock ticks" << endl;
+                cout << "time: " << ticks * 1.0 / CLOCKS_PER_SEC << " seconds" << endl;
+                break;
         }
     }
 
