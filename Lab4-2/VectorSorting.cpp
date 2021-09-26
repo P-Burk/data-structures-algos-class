@@ -120,7 +120,42 @@ vector<Bid> loadBids(string csvPath) {
  * @param end Ending index to partition
  */
 int partition(vector<Bid>& bids, int begin, int end) {
+    //sets pivot bid to whatever bid is at the middle index between begin and end
+    Bid pivotBid = bids.at(begin + (end - begin) / 2);
 
+    //initialize helper variables
+    int low = begin;
+    int high = end;
+    bool done = false;
+
+    //main loop
+    while (!done) {
+
+        //increments low while the bid @ l is less than the pivotBid
+        while (bids[low].title < pivotBid.title) {
+            ++low;
+        }
+
+        //decrements h while the bid @ high is more than the pivotBid
+        while (pivotBid.title < bids[high].title) {
+            --high;
+        }
+
+        //used for exiting the main loop
+        if (low >= high) {
+            done = true;
+        }
+
+        //Swap bids from between low and high partitions
+        else {
+            Bid tempHolder = bids[low];
+            bids[low] = bids[high];
+            bids[high] = tempHolder;
+            ++low;
+            --high;
+        }
+    }
+    return high;
 }
 
 /**
@@ -133,9 +168,19 @@ int partition(vector<Bid>& bids, int begin, int end) {
  * @param end the ending index to sort on
  */
 void quickSort(vector<Bid>& bids, int begin, int end) {
+    int j = 0;
 
+    //base case
+    if (begin >= end) {
+        return;
+    }
 
+    //partition the vector
+    j = partition(bids, begin, end);
 
+    //recursively call quicksort() to sort the low partition and then the high partition
+    quickSort(bids, begin, j);
+    quickSort(bids, j+1, end);
 }
 
 // FIXME (1a) COMPLETE: Implement the selection sort logic over bid.title
@@ -191,12 +236,7 @@ int main(int argc, char* argv[]) {
         csvPath = argv[1];
         break;
     default:
-        //TODO: delete comments and big batch
-        //small batch
         csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
-
-        //big batch
-        //csvPath = "eBid_Monthly_Sales.csv";
     }
 
     // Define a vector to hold all the bids
@@ -262,7 +302,7 @@ int main(int argc, char* argv[]) {
                 // Initialize a timer variable before loading bids
                 ticks = clock();
 
-                cout << "code the quick sort call" << endl;
+                quickSort(bids, 0, int (bids.size()-1));
 
                 cout << bids.size() << " bids sorted" << endl;
 
