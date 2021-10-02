@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : HashTable.cpp
-// Author      : John Watson
+// Author      : Preston Burkhardt
 // Version     : 1.0
 // Copyright   : Copyright © 2017 SNHU COCE
 // Description : Hello World in C++, Ansi-style
@@ -10,6 +10,7 @@
 #include <climits>
 #include <iostream>
 #include <string> // atoi
+#include <utility>
 #include <time.h>
 
 #include "CSVparser.hpp"
@@ -48,6 +49,34 @@ class HashTable {
 
 private:
     // FIXME (1): Define structures to hold bids
+    //node to hold each bid in the linked list
+    struct bidNode {
+        Bid bid;
+        unsigned bidKey;
+        bidNode *nextNode;
+
+        //default constructor
+        bidNode() {
+            bidKey = UINT_MAX;
+            nextNode = nullptr;
+        };
+
+        //constructor with a bid passed in
+        bidNode(Bid passedBid) : bidNode() {
+            this->bid = passedBid;
+        };
+
+        //constructor with bid and key
+        bidNode(Bid passedBid, unsigned passedKey) : bidNode(passedBid) {
+            this->bidKey = passedKey;
+        };
+    };
+
+    //use tableSize for vector resizing operations if needed
+    unsigned tableSize = DEFAULT_SIZE;
+
+    //vector to hold all the nodes
+    vector<bidNode> nodesVector;
 
     unsigned int hash(int key);
 
@@ -65,6 +94,7 @@ public:
  */
 HashTable::HashTable() {
     // FIXME (2): Initialize the structures used to hold bids
+    nodesVector.resize(tableSize);
 }
 
 /**
@@ -72,6 +102,7 @@ HashTable::HashTable() {
  */
 HashTable::~HashTable() {
     // FIXME (3): Implement logic to free storage when class is destroyed
+    nodesVector.erase(nodesVector.begin());
 }
 
 /**
@@ -85,6 +116,8 @@ HashTable::~HashTable() {
  */
 unsigned int HashTable::hash(int key) {
     // FIXME (4): Implement logic to calculate a hash value
+    //calculates the key based on the size of the hash table
+    return key % tableSize;
 }
 
 /**
@@ -94,6 +127,39 @@ unsigned int HashTable::hash(int key) {
  */
 void HashTable::Insert(Bid bid) {
     // FIXME (5): Implement logic to insert a bid
+
+    //calculate key
+    unsigned key = hash(atoi(bid.bidId.c_str()));
+
+    //initializes oldNode as the node in the vector at the hash key
+    bidNode* oldNode = &(nodesVector.at(key));
+
+    //oldNode is null (bid isn't in the table)
+    if (oldNode == nullptr) {
+        bidNode* newNode = new bidNode(bid, key);
+        nodesVector.insert(nodesVector.begin() + key, (*newNode));
+    }
+
+    //oldNode is not null (bid does exist in the table)
+    else {
+        /*
+         * if/else to see if the bid @ oldNode is the only one in the bucket.
+         * Finds the last node in the bucket if not the only bid.
+         */
+        if (oldNode->bidKey == UINT_MAX) {
+            oldNode->bidKey = key;
+            oldNode->bid = bid;
+            oldNode->nextNode = nullptr;
+        }
+        else {
+            //find the last node in the linked list
+            while (oldNode->nextNode != nullptr) {
+                oldNode = oldNode->nextNode;
+            }
+            //add new bidNode to the end of the list
+            oldNode->nextNode = new bidNode(bid, key);
+        }
+    }
 }
 
 /**
