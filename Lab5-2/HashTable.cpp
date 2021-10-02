@@ -78,6 +78,9 @@ private:
     //vector to hold all the nodes
     vector<bidNode> nodesVector;
 
+    //helper pointer for traversing linked lists
+    bidNode* currNode;
+
     unsigned int hash(int key);
 
 public:
@@ -167,6 +170,26 @@ void HashTable::Insert(Bid bid) {
  */
 void HashTable::PrintAll() {
     // FIXME (6): Implement logic to print all bids
+
+    //loop through all the baskets in the vector
+    for (auto & bidNode : nodesVector) {
+
+        //if the key is not the default key, then print the bid's info
+        if (bidNode.bidKey != UINT_MAX) {
+            cout << bidNode.bid.bidId << ": " << bidNode.bid.title << " | " << bidNode.bid.amount << " | "
+                 << bidNode.bid.fund << endl;
+
+            //set currNode equal to the next node that the current node points to
+            currNode = bidNode.nextNode;
+
+            //print bid info if currNode isn't null and increment currNode to the next node via bid.nextNode
+            while (currNode != nullptr) {
+                cout << currNode->bid.bidId << ": " << currNode->bid.title << " | " << currNode->bid.amount << " | "
+                     << currNode->bid.fund << endl;
+                currNode = currNode->nextNode;
+            }
+        }
+    }
 }
 
 /**
