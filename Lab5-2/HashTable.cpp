@@ -223,12 +223,14 @@ void HashTable::Remove(string bidId) {
 
             //if the bid to be deleted is not the first of last node
             if (currNode->bid.bidId == bidId && currNode->nextNode != nullptr) {
+                delete nodesVector.at(key).nextNode;
                 nodesVector.at(key).nextNode = currNode->nextNode;
                 break;
             }
 
             //if the bid is the last node in the list
             else if (currNode->bid.bidId == bidId) {
+                delete nodesVector.at(key).nextNode;
                 nodesVector.at(key).nextNode = nullptr;
                 break;
             }
