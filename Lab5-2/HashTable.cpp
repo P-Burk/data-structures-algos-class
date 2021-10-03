@@ -134,33 +134,33 @@ void HashTable::Insert(Bid bid) {
     //calculate key
     unsigned key = hash(atoi(bid.bidId.c_str()));
 
-    //initializes oldNode as the node in the vector at the hash key
-    bidNode* oldNode = &(nodesVector.at(key));
+    //initializes pNode as the node in the vector at the hash key
+    bidNode* pNode = &(nodesVector.at(key));
 
-    //oldNode is null (bid isn't in the table)
-    if (oldNode == nullptr) {
-        bidNode* newNode = new bidNode(bid, key);
+    //pNode is null (bid isn't in the table)
+    if (pNode == nullptr) {
+        auto* newNode = new bidNode(bid, key);
         nodesVector.insert(nodesVector.begin() + key, (*newNode));
     }
 
-    //oldNode is not null (bid does exist in the table)
+    //pNode is not null (bid does exist in the table)
     else {
         /*
-         * if/else to see if the bid @ oldNode is the only one in the bucket.
+         * if/else to see if the bid @ pNode is the only one in the bucket.
          * Finds the last node in the bucket if not the only bid.
          */
-        if (oldNode->bidKey == UINT_MAX) {
-            oldNode->bidKey = key;
-            oldNode->bid = bid;
-            oldNode->nextNode = nullptr;
+        if (pNode->bidKey == UINT_MAX) {
+            pNode->bidKey = key;
+            pNode->bid = bid;
+            pNode->nextNode = nullptr;
         }
         else {
             //find the last node in the linked list
-            while (oldNode->nextNode != nullptr) {
-                oldNode = oldNode->nextNode;
+            while (pNode->nextNode != nullptr) {
+                pNode = pNode->nextNode;
             }
             //add new bidNode to the end of the list
-            oldNode->nextNode = new bidNode(bid, key);
+            pNode->nextNode = new bidNode(bid, key);
         }
     }
 }
@@ -220,10 +220,14 @@ void HashTable::Remove(string bidId) {
     //erase subsequent bids in the bucket
     else if (nodesVector.at(key).bid.bidId != bidId && nodesVector.at(key).nextNode != nullptr) {
         while (currNode != nullptr) {
+
+            //if the bid to be deleted is not the first of last node
             if (currNode->bid.bidId == bidId && currNode->nextNode != nullptr) {
                 nodesVector.at(key).nextNode = currNode->nextNode;
                 break;
             }
+
+            //if the bid is the last node in the list
             else if (currNode->bid.bidId == bidId) {
                 nodesVector.at(key).nextNode = nullptr;
                 break;
