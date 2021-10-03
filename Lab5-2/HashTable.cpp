@@ -79,7 +79,7 @@ private:
     vector<bidNode> nodesVector;
 
     //helper pointer for traversing linked lists
-    bidNode* currNode;
+    bidNode* currNode = nullptr;
 
     unsigned int hash(int key);
 
@@ -198,7 +198,40 @@ void HashTable::PrintAll() {
  * @param bidId The bid id to search for
  */
 void HashTable::Remove(string bidId) {
-    // FIXME (7): Implement logic to remove a bid
+    // FIXME (7) DONE: Implement logic to remove a bid
+
+    //calculate key
+    unsigned key = hash(atoi(bidId.c_str()));
+
+    //assign currNode to the next node in the linked list
+    currNode = nodesVector.at(key).nextNode;
+
+    //erase the bid in the bucket if it's the only one
+    if (nodesVector.at(key).bid.bidId == bidId && nodesVector.at(key).nextNode == nullptr) {
+        nodesVector.erase(nodesVector.begin() + key);
+    }
+
+    //erase the first bid in the bucket
+    else if (nodesVector.at(key).bid.bidId == bidId && nodesVector.at(key).nextNode != nullptr) {
+        nodesVector.erase(nodesVector.begin() + key);
+        nodesVector.at(key).bid = currNode->bid;
+    }
+
+    //erase subsequent bids in the bucket
+    else if (nodesVector.at(key).bid.bidId != bidId && nodesVector.at(key).nextNode != nullptr) {
+        while (currNode != nullptr) {
+            if (currNode->bid.bidId == bidId && currNode->nextNode != nullptr) {
+                nodesVector.at(key).nextNode = currNode->nextNode;
+                break;
+            }
+            else if (currNode->bid.bidId == bidId) {
+                nodesVector.at(key).nextNode = nullptr;
+                break;
+            }
+            currNode = currNode->nextNode;
+        }
+    }
+    currNode = nullptr;
 }
 
 /**
@@ -362,12 +395,6 @@ int main(int argc, char* argv[]) {
             break;
 
         case 3:
-/*
-            //TODO: delete this. Debug purposes only.
-            cout << "Input bid ID: ";
-            cin >> bidKey;
-            cout << "Your bid key is: " << endl;
-*/
             ticks = clock();
 
             bid = bidTable->Search(bidKey);
@@ -385,12 +412,6 @@ int main(int argc, char* argv[]) {
             break;
 
         case 4:
-
-            //TODO: delete this. Debug purposes only.
-            cout << "Input bid ID: ";
-            cin >> bidKey;
-            cout << "Your bid key is: " << endl;
-
             bidTable->Remove(bidKey);
             break;
         }
