@@ -48,7 +48,7 @@ struct Bid {
 class HashTable {
 
 private:
-    // FIXME (1): Define structures to hold bids
+    // FIXME (1) DONE: Define structures to hold bids
     //node to hold each bid in the linked list
     struct bidNode {
         Bid bid;
@@ -96,7 +96,7 @@ public:
  * Default constructor
  */
 HashTable::HashTable() {
-    // FIXME (2): Initialize the structures used to hold bids
+    // FIXME (2) DONE: Initialize the structures used to hold bids
     nodesVector.resize(tableSize);
 }
 
@@ -104,7 +104,7 @@ HashTable::HashTable() {
  * Destructor
  */
 HashTable::~HashTable() {
-    // FIXME (3): Implement logic to free storage when class is destroyed
+    // FIXME (3) DONE: Implement logic to free storage when class is destroyed
     nodesVector.erase(nodesVector.begin());
 }
 
@@ -118,7 +118,7 @@ HashTable::~HashTable() {
  * @return The calculated hash
  */
 unsigned int HashTable::hash(int key) {
-    // FIXME (4): Implement logic to calculate a hash value
+    // FIXME (4) DONE: Implement logic to calculate a hash value
     //calculates the key based on the size of the hash table
     return key % tableSize;
 }
@@ -129,7 +129,7 @@ unsigned int HashTable::hash(int key) {
  * @param bid The bid to insert
  */
 void HashTable::Insert(Bid bid) {
-    // FIXME (5): Implement logic to insert a bid
+    // FIXME (5) DONE: Implement logic to insert a bid
 
     //calculate key
     unsigned key = hash(atoi(bid.bidId.c_str()));
@@ -169,7 +169,7 @@ void HashTable::Insert(Bid bid) {
  * Print all bids
  */
 void HashTable::PrintAll() {
-    // FIXME (6): Implement logic to print all bids
+    // FIXME (6) DONE: Implement logic to print all bids
 
     //loop through all the baskets in the vector
     for (auto & bidNode : nodesVector) {
@@ -208,9 +208,27 @@ void HashTable::Remove(string bidId) {
  */
 Bid HashTable::Search(string bidId) {
     Bid bid;
+    // FIXME (8) DONE: Implement logic to search for and return a bid
 
-    // FIXME (8): Implement logic to search for and return a bid
+    //calculate key
+    unsigned key = hash(atoi(bidId.c_str()));
 
+    //return the bid at the key if it's id matches the bidId argument
+    if (nodesVector.at(key).bid.bidId == bidId) {
+        return nodesVector.at(key).bid;
+    }
+
+    //search the other nodes in the linked list if the head node doesn't match
+    else {
+        currNode = nodesVector.at(key).nextNode;
+        while (currNode != nullptr) {
+            if (currNode->bid.bidId == bidId) {
+                return currNode->bid;
+            }
+            currNode = currNode->nextNode;
+        }
+    }
+    //returns empty bid
     return bid;
 }
 
@@ -344,6 +362,12 @@ int main(int argc, char* argv[]) {
             break;
 
         case 3:
+/*
+            //TODO: delete this. Debug purposes only.
+            cout << "Input bid ID: ";
+            cin >> bidKey;
+            cout << "Your bid key is: " << endl;
+*/
             ticks = clock();
 
             bid = bidTable->Search(bidKey);
@@ -361,6 +385,12 @@ int main(int argc, char* argv[]) {
             break;
 
         case 4:
+
+            //TODO: delete this. Debug purposes only.
+            cout << "Input bid ID: ";
+            cin >> bidKey;
+            cout << "Your bid key is: " << endl;
+
             bidTable->Remove(bidKey);
             break;
         }
