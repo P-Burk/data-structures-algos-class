@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : HashTable.cpp
-// Author      : John Watson
+// Author      : Preston Burkhardt
 // Version     : 1.0
 // Copyright   : Copyright © 2017 SNHU COCE
 // Description : Hello World in C++, Ansi-style
@@ -10,6 +10,7 @@
 #include <climits>
 #include <iostream>
 #include <string> // atoi
+#include <utility>
 #include <time.h>
 
 #include "CSVparser.hpp"
@@ -47,7 +48,38 @@ struct Bid {
 class HashTable {
 
 private:
-    // FIXME (1): Define structures to hold bids
+    // FIXME (1) DONE: Define structures to hold bids
+    //node to hold each bid in the linked list
+    struct bidNode {
+        Bid bid;
+        unsigned bidKey;
+        bidNode *nextNode;
+
+        //default constructor
+        bidNode() {
+            bidKey = UINT_MAX;
+            nextNode = nullptr;
+        };
+
+        //constructor with a bid passed in
+        bidNode(Bid passedBid) : bidNode() {
+            this->bid = passedBid;
+        };
+
+        //constructor with bid and key
+        bidNode(Bid passedBid, unsigned passedKey) : bidNode(passedBid) {
+            this->bidKey = passedKey;
+        };
+    };
+
+    //use tableSize for vector resizing operations if needed
+    unsigned tableSize = DEFAULT_SIZE;
+
+    //vector to hold all the nodes
+    vector<bidNode> nodesVector;
+
+    //helper pointer for traversing linked lists
+    bidNode* currNode = nullptr;
 
     unsigned int hash(int key);
 
@@ -64,14 +96,16 @@ public:
  * Default constructor
  */
 HashTable::HashTable() {
-    // FIXME (2): Initialize the structures used to hold bids
+    // FIXME (2) DONE: Initialize the structures used to hold bids
+    nodesVector.resize(tableSize);
 }
 
 /**
  * Destructor
  */
 HashTable::~HashTable() {
-    // FIXME (3): Implement logic to free storage when class is destroyed
+    // FIXME (3) DONE: Implement logic to free storage when class is destroyed
+    nodesVector.erase(nodesVector.begin());
 }
 
 /**
@@ -84,7 +118,9 @@ HashTable::~HashTable() {
  * @return The calculated hash
  */
 unsigned int HashTable::hash(int key) {
-    // FIXME (4): Implement logic to calculate a hash value
+    // FIXME (4) DONE: Implement logic to calculate a hash value
+    //calculates the key based on the size of the hash table
+    return key % tableSize;
 }
 
 /**
@@ -93,14 +129,67 @@ unsigned int HashTable::hash(int key) {
  * @param bid The bid to insert
  */
 void HashTable::Insert(Bid bid) {
-    // FIXME (5): Implement logic to insert a bid
+    // FIXME (5) DONE: Implement logic to insert a bid
+
+    //calculate key
+    unsigned key = hash(atoi(bid.bidId.c_str()));
+
+    //initializes pNode as the node in the vector at the hash key
+    bidNode* pNode = &(nodesVector.at(key));
+
+    //pNode is null (bid isn't in the table)
+    if (pNode == nullptr) {
+        auto* newNode = new bidNode(bid, key);
+        nodesVector.insert(nodesVector.begin() + key, (*newNode));
+    }
+
+    //pNode is not null (bid does exist in the table)
+    else {
+        /*
+         * if/else to see if the bid @ pNode is the only one in the bucket.
+         * Finds the last node in the bucket if not the only bid.
+         */
+        if (pNode->bidKey == UINT_MAX) {
+            pNode->bidKey = key;
+            pNode->bid = bid;
+            pNode->nextNode = nullptr;
+        }
+        else {
+            //find the last node in the linked list
+            while (pNode->nextNode != nullptr) {
+                pNode = pNode->nextNode;
+            }
+            //add new bidNode to the end of the list
+            pNode->nextNode = new bidNode(bid, key);
+        }
+    }
 }
 
 /**
  * Print all bids
  */
 void HashTable::PrintAll() {
-    // FIXME (6): Implement logic to print all bids
+    // FIXME (6) DONE: Implement logic to print all bids
+
+    //loop through all the baskets in the vector
+    for (auto & bidNode : nodesVector) {
+
+        //if the key is not the default key, then print the bid's info
+        if (bidNode.bidKey != UINT_MAX) {
+            cout << bidNode.bid.bidId << ": " << bidNode.bid.title << " | " << bidNode.bid.amount << " | "
+                 << bidNode.bid.fund << endl;
+
+            //set currNode equal to the next node that the current node points to
+            currNode = bidNode.nextNode;
+
+            //print bid info if currNode isn't null and increment currNode to the next node via bid.nextNode
+            while (currNode != nullptr) {
+                cout << currNode->bid.bidId << ": " << currNode->bid.title << " | " << currNode->bid.amount << " | "
+                     << currNode->bid.fund << endl;
+                currNode = currNode->nextNode;
+            }
+        }
+    }
 }
 
 /**
@@ -109,7 +198,46 @@ void HashTable::PrintAll() {
  * @param bidId The bid id to search for
  */
 void HashTable::Remove(string bidId) {
-    // FIXME (7): Implement logic to remove a bid
+    // FIXME (7) DONE: Implement logic to remove a bid
+
+    //calculate key
+    unsigned key = hash(atoi(bidId.c_str()));
+
+    //assign currNode to the next node in the linked list
+    currNode = nodesVector.at(key).nextNode;
+
+    //erase the bid in the bucket if it's the only one
+    if (nodesVector.at(key).bid.bidId == bidId && nodesVector.at(key).nextNode == nullptr) {
+        nodesVector.erase(nodesVector.begin() + key);
+    }
+
+    //erase the first bid in the bucket
+    else if (nodesVector.at(key).bid.bidId == bidId && nodesVector.at(key).nextNode != nullptr) {
+        nodesVector.erase(nodesVector.begin() + key);
+        nodesVector.at(key).bid = currNode->bid;
+    }
+
+    //erase subsequent bids in the bucket
+    else if (nodesVector.at(key).bid.bidId != bidId && nodesVector.at(key).nextNode != nullptr) {
+        while (currNode != nullptr) {
+
+            //if the bid to be deleted is not the first of last node
+            if (currNode->bid.bidId == bidId && currNode->nextNode != nullptr) {
+                delete nodesVector.at(key).nextNode;
+                nodesVector.at(key).nextNode = currNode->nextNode;
+                break;
+            }
+
+            //if the bid is the last node in the list
+            else if (currNode->bid.bidId == bidId) {
+                delete nodesVector.at(key).nextNode;
+                nodesVector.at(key).nextNode = nullptr;
+                break;
+            }
+            currNode = currNode->nextNode;
+        }
+    }
+    currNode = nullptr;
 }
 
 /**
@@ -119,9 +247,27 @@ void HashTable::Remove(string bidId) {
  */
 Bid HashTable::Search(string bidId) {
     Bid bid;
+    // FIXME (8) DONE: Implement logic to search for and return a bid
 
-    // FIXME (8): Implement logic to search for and return a bid
+    //calculate key
+    unsigned key = hash(atoi(bidId.c_str()));
 
+    //return the bid at the key if it's id matches the bidId argument
+    if (nodesVector.at(key).bid.bidId == bidId) {
+        return nodesVector.at(key).bid;
+    }
+
+    //search the other nodes in the linked list if the head node doesn't match
+    else {
+        currNode = nodesVector.at(key).nextNode;
+        while (currNode != nullptr) {
+            if (currNode->bid.bidId == bidId) {
+                return currNode->bid;
+            }
+            currNode = currNode->nextNode;
+        }
+    }
+    //returns empty bid
     return bid;
 }
 
