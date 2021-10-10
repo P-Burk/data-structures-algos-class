@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <time.h>
+#include <algorithm>    // needed for strToDouble()
 
 #include "CSVparser.hpp"
 
@@ -31,8 +32,16 @@ struct Bid {
     }
 };
 
-// FIXME (1): Internal structure for tree node
+// FIXME (1) DONE: Internal structure for tree node
 struct Node {
+    Bid bid;
+    Node* leftNode = nullptr;
+    Node* rightNode = nullptr;
+
+    //constructor to initialize w/ a bid
+    Node(Bid passedBid) {
+        this->bid = passedBid;
+    }
 };
 
 //============================================================================
@@ -46,11 +55,15 @@ struct Node {
 class BinarySearchTree {
 
 private:
-    Node* root;
+    Node* root = nullptr;
 
     void addNode(Node* node, Bid bid);
     void inOrder(Node* node);
     Node* removeNode(Node* node, string bidId);
+
+    //helper pointers
+    Node* currNode = nullptr;
+    Node* anchorNode = nullptr;
 
 public:
     BinarySearchTree();
@@ -59,6 +72,9 @@ public:
     void Insert(Bid bid);
     void Remove(string bidId);
     Bid Search(string bidId);
+
+    //NOTE: delete this before turning in
+    int nodeCounter = 0;
 };
 
 /**
@@ -79,12 +95,52 @@ BinarySearchTree::~BinarySearchTree() {
  * Traverse the tree in order
  */
 void BinarySearchTree::InOrder() {
+    //NOTE: this is for testing/debug purposes. Delete before turn in
+    cout << "Root bid ID is: " << this->root->bid.bidId << endl;
+    cout << "Total nodes in the tree: " << nodeCounter << endl;
 }
 /**
  * Insert a bid
  */
 void BinarySearchTree::Insert(Bid bid) {
-    // FIXME (2a) Implement inserting a bid into the tree
+    // FIXME (2a) DONE: Implement inserting a bid into the tree
+
+    //if the tree is empty
+    if (this->root == nullptr) {
+        this->root = new Node(bid);
+    }
+    else {
+        //set current node to root so that we can traverse the tree
+        this->currNode = this->root;
+
+        while (currNode != nullptr) {
+
+            //logic for navigating left branch (less than)
+            //if (strToDouble(bid.bidId, ' ') > strToDouble(this->currNode->bid.bidId, ' '))
+            if (bid.bidId < this->currNode->bid.bidId) {
+                if (this->currNode->leftNode == nullptr) {
+                    this->currNode->leftNode = new Node(bid);
+                    break;
+                }
+                else {
+                    this->currNode = currNode->leftNode;
+                }
+            }
+
+            //logic for navigating right branch (greater than)
+            // if (strToDouble(bid.bidId, ' ') > strToDouble(this->currNode->bid.bidId, ' '))
+            else if (bid.bidId > this->currNode->bid.bidId) {
+                if (this->currNode->rightNode == nullptr) {
+                    this->currNode->rightNode = new Node(bid);
+                    break;
+                }
+                else {
+                    this->currNode = currNode->rightNode;
+                }
+            }
+        }
+    }
+    nodeCounter++;
 }
 
 /**
@@ -98,8 +154,24 @@ void BinarySearchTree::Remove(string bidId) {
  * Search for a bid
  */
 Bid BinarySearchTree::Search(string bidId) {
-    // FIXME (3) Implement searching the tree for a bid
+    // FIXME (3) DONE: Implement searching the tree for a bid
+    this->currNode = this->root;
 
+    while (currNode != nullptr) {
+        cout << "CURRENT BID: " << currNode->bid.bidId << endl;
+/*        cout << "CURRENT NODE LEFT BID: " << currNode->leftNode->bid.bidId << endl;
+        cout << "CURRENT NODE RIGHT BID: " << currNode->rightNode->bid.bidId << endl;*/
+        if (currNode->bid.bidId == bidId) {
+            return currNode->bid;
+        }
+        else if (bidId < currNode->bid.bidId) {
+                currNode = currNode->leftNode;
+        }
+
+        else if (bidId > currNode->bid.bidId) {
+                currNode = currNode->rightNode;
+        }
+    }
 	Bid bid;
     return bid;
 }
@@ -200,7 +272,8 @@ int main(int argc, char* argv[]) {
         bidKey = argv[2];
         break;
     default:
-        csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
+        //csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
+        csvPath = "eBid_Monthly_Sales_Dec_2016_debug.csv";
         bidKey = "98109";
     }
 
@@ -247,6 +320,10 @@ int main(int argc, char* argv[]) {
             break;
 
         case 3:
+            //for debug/testing purposes
+            cout << "Enter bid ID: ";
+            cin >> bidKey;
+
             ticks = clock();
 
             bid = bst->Search(bidKey);
@@ -265,6 +342,10 @@ int main(int argc, char* argv[]) {
             break;
 
         case 4:
+            //for debug/testing purposes
+            cout << "Enter bid ID: ";
+            cin >> bidKey;
+
             bst->Remove(bidKey);
             break;
         }
