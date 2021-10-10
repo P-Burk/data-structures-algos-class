@@ -79,9 +79,6 @@ public:
     void Insert(Bid bid);
     void Remove(Node* node, string bidId);
     Bid Search(string bidId);
-
-    //NOTE: delete this before turning in
-    int nodeCounter = 0;
 };
 
 /**
@@ -102,9 +99,6 @@ BinarySearchTree::~BinarySearchTree() {
  * Traverse the tree in order
  */
 void BinarySearchTree::InOrder() {
-    //NOTE: this is for testing/debug purposes. Delete before turn in
-    cout << "Root bid ID is: " << this->root->bid.bidId << endl;
-    cout << "Total nodes in the tree: " << nodeCounter << endl;
 }
 /**
  * Insert a bid
@@ -389,8 +383,8 @@ int main(int argc, char* argv[]) {
         bidKey = argv[2];
         break;
     default:
-        //csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
-        csvPath = "eBid_Monthly_Sales_Dec_2016_debug.csv";
+        csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
+        //csvPath = "eBid_Monthly_Sales_Dec_2016_debug.csv";    //debug csv with fewer values
         bidKey = "98109";
     }
 
@@ -437,9 +431,11 @@ int main(int argc, char* argv[]) {
             break;
 
         case 3:
+/*
             //for debug/testing purposes
             cout << "Enter bid ID: ";
             cin >> bidKey;
+*/
 
             ticks = clock();
 
@@ -459,11 +455,13 @@ int main(int argc, char* argv[]) {
             break;
 
         case 4:
+/*
             //for debug/testing purposes
             cout << "Enter bid ID: ";
             cin >> bidKey;
+*/
 
-            bst->Remove(bidKey);
+            bst->Remove(nullptr, bidKey);
             break;
         }
     }
