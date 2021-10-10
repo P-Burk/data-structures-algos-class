@@ -112,15 +112,10 @@ void BinarySearchTree::InOrder() {
 void BinarySearchTree::Insert(Bid bid) {
     // FIXME (2a) DONE: Implement inserting a bid into the tree
 
-    //create the new node and assign the passed bid to it
-    Node* aNewNode = new Node;
-    addNode(aNewNode, bid);
-
-
     //if the tree is empty
     if (this->root == nullptr) {
-        //this->root = new Node(bid);
-        this->root = aNewNode;
+        this->root = new Node;
+        addNode(this->root, bid);
     }
     else {
         //set current node to root so that we can traverse the tree
@@ -129,10 +124,10 @@ void BinarySearchTree::Insert(Bid bid) {
         while (currNode != nullptr) {
 
             //logic for navigating left branch (less than)
-            if (bid.bidId < this->currNode->bid.bidId) {
+            if (bid.bidId <= this->currNode->bid.bidId) {
                 if (this->currNode->leftNode == nullptr) {
-                    //this->currNode->leftNode = new Node(bid);
-                    this->currNode->leftNode = aNewNode;
+                    this->currNode->leftNode = new Node;
+                    addNode(this->currNode->leftNode, bid);
                     break;
                 }
                 else {
@@ -141,11 +136,10 @@ void BinarySearchTree::Insert(Bid bid) {
             }
 
             //logic for navigating right branch (greater than)
-            // if (strToDouble(bid.bidId, ' ') > strToDouble(this->currNode->bid.bidId, ' '))
             else if (bid.bidId > this->currNode->bid.bidId) {
                 if (this->currNode->rightNode == nullptr) {
-                    //this->currNode->rightNode = new Node(bid);
-                    this->currNode->rightNode = aNewNode;
+                    this->currNode->rightNode = new Node;
+                    addNode(this->currNode->rightNode, bid);
                     break;
                 }
                 else {
@@ -154,7 +148,7 @@ void BinarySearchTree::Insert(Bid bid) {
             }
         }
     }
-    nodeCounter++;
+    currNode = nullptr;
 }
 
 /**
