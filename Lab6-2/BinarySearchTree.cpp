@@ -265,21 +265,28 @@ void BinarySearchTree::Remove(Node* passedNode, string bidId) {
  */
 Bid BinarySearchTree::Search(string bidId) {
     // FIXME (3) DONE: Implement searching the tree for a bid
+
     this->currNode = this->root;
 
     while (currNode != nullptr) {
-        cout << "CURRENT BID: " << currNode->bid.bidId << endl;
+
+        //return the bid when found
         if (currNode->bid.bidId == bidId) {
             return currNode->bid;
         }
+
+        //navigate the tree LEFT
         else if (bidId < currNode->bid.bidId) {
                 currNode = currNode->leftNode;
         }
-
+        //navigate the tree RIGHT
         else if (bidId > currNode->bid.bidId) {
                 currNode = currNode->rightNode;
         }
     }
+
+    //reset currNode and return empty bid;
+    currNode = nullptr;
 	Bid bid;
     return bid;
 }
@@ -292,11 +299,8 @@ Bid BinarySearchTree::Search(string bidId) {
  */
 void BinarySearchTree::addNode(Node* node, Bid bid) {
     // FIXME (2b) DONE: Implement inserting a bid into the tree
-    //why is this function here when you can just initialize a node with a bid via non-default constructor???
 
     node->bid = bid;
-
-   //BinarySearchTree::Search(node->bid.bidId) = bid;
 }
 void BinarySearchTree::inOrder(Node* node) {
 }
