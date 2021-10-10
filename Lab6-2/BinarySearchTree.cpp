@@ -68,6 +68,7 @@ private:
     Node* removeNode(Node* node, string bidId);
 
     //helper pointers
+    Node* prevNode = nullptr;
     Node* currNode = nullptr;
     Node* anchorNode = nullptr;
 
@@ -76,7 +77,7 @@ public:
     virtual ~BinarySearchTree();
     void InOrder();
     void Insert(Bid bid);
-    void Remove(string bidId);
+    void Remove(Node* node, string bidId);
     Bid Search(string bidId);
 
     //NOTE: delete this before turning in
@@ -159,8 +160,110 @@ void BinarySearchTree::Insert(Bid bid) {
 /**
  * Remove a bid
  */
-void BinarySearchTree::Remove(string bidId) {
-    // FIXME (4a) Implement removing a bid from the tree
+//I changed this function to take a pointer argument so that the function can be called recursively at a
+//node that isn't the root node. This allows the function to be used when deleting a node with two child nodes.
+void BinarySearchTree::Remove(Node* passedNode, string bidId) {
+    // FIXME (4a) DONE: Implement removing a bid from the tree
+
+    //logic for differentiating between recursive call or normal call
+    if (passedNode == nullptr) {
+        this->anchorNode = this->root;
+        this->prevNode = this->root;
+        this->currNode = this->root;
+    }
+    else {
+        this->anchorNode = passedNode;
+        this->prevNode = passedNode;
+        this->currNode = passedNode;
+    }
+
+    //find the bid and delete
+    while (currNode != nullptr) {
+        if (currNode->bid.bidId == bidId){
+            anchorNode = currNode;
+
+            //logic for deleting a leaf
+            if (currNode->leftNode == nullptr && currNode->rightNode == nullptr) {
+                if (prevNode->leftNode == currNode) {           //delete a left leaf
+                    cout << prevNode->leftNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->leftNode;
+                    prevNode->leftNode = nullptr;
+                }
+                else if (prevNode->rightNode == currNode) {     //delete a right leaf
+                    cout << prevNode->rightNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->rightNode;
+                    prevNode->rightNode = nullptr;
+                }
+            }
+
+            //logic for deleting an internal node with only a LEFT child
+            else if (currNode->leftNode != nullptr && currNode->rightNode == nullptr) {
+                currNode = currNode->leftNode;
+                if (prevNode->leftNode == anchorNode) {         //delete a left successor
+                    cout << prevNode->leftNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->leftNode;
+                    prevNode->leftNode = currNode;
+                }
+                else if (prevNode->rightNode == anchorNode) {   //delete a right successor
+                    cout << prevNode->rightNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->rightNode;
+                    prevNode->rightNode = currNode;
+                }
+            }
+
+            //logic for deleting an internal node with only a RIGHT child
+            else if (currNode->leftNode == nullptr && currNode->rightNode != nullptr) {
+                currNode = currNode->rightNode;
+                if (prevNode->leftNode == anchorNode) {         //delete a left successor
+                    cout << prevNode->leftNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->leftNode;
+                    prevNode->leftNode = currNode;
+                }
+                else if (prevNode->rightNode == anchorNode) {   //delete a right successor
+                    cout << prevNode->rightNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->rightNode;
+                    prevNode->rightNode = currNode;
+                }
+            }
+
+            //logic for deleting an internal node with both a right and left child
+            else if (currNode->leftNode != nullptr && currNode->rightNode != nullptr) {
+                currNode = currNode->rightNode;
+                while (currNode->leftNode != nullptr) {
+                    currNode = currNode->leftNode;
+                }
+
+                //sets the anchor node to the current node
+                addNode(anchorNode, currNode->bid);
+
+                //call Remove() recursively with specification on where to begin search for the node/bid to delete
+                Remove(anchorNode->rightNode, currNode->bid.bidId);
+            }
+            break;
+        }
+
+        //navigate the tree LEFT
+        else if (bidId < currNode->bid.bidId) {
+            prevNode = currNode;
+            currNode = currNode->leftNode;
+        }
+
+        //navigate the tree RIGHT
+        else if (bidId > currNode->bid.bidId) {
+            prevNode = currNode;
+            currNode = currNode->rightNode;
+        }
+    }
+
+    //output for if the bidID isn't in the tree
+    if (currNode == nullptr) {
+        cout << bidId << " not found!" << endl;
+    }
+
+    //reset helper pointers to null
+    this->anchorNode = nullptr;
+    this->prevNode = nullptr;
+    this->currNode = nullptr;
 }
 
 /**
