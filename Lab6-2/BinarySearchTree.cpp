@@ -35,10 +35,14 @@ struct Bid {
 // FIXME (1) DONE: Internal structure for tree node
 struct Node {
     Bid bid;
-    Node* leftNode = nullptr;
-    Node* rightNode = nullptr;
+    Node* leftNode;
+    Node* rightNode;
 
-    Node() = default;
+    //default constructor
+    Node() {
+        leftNode = nullptr;
+        rightNode = nullptr;
+    }
 
     //constructor to initialize w/ a bid
     Node(Bid passedBid) {
