@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <time.h>
+#include <algorithm>    // needed for strToDouble()
 
 #include "CSVparser.hpp"
 
@@ -31,8 +32,22 @@ struct Bid {
     }
 };
 
-// FIXME (1): Internal structure for tree node
+// FIXME (1) DONE: Internal structure for tree node
 struct Node {
+    Bid bid;
+    Node* leftNode;
+    Node* rightNode;
+
+    //default constructor
+    Node() {
+        leftNode = nullptr;
+        rightNode = nullptr;
+    }
+
+    //constructor to initialize w/ a bid
+    Node(Bid passedBid) {
+        this->bid = passedBid;
+    }
 };
 
 //============================================================================
@@ -46,18 +61,23 @@ struct Node {
 class BinarySearchTree {
 
 private:
-    Node* root;
+    Node* root = nullptr;
 
     void addNode(Node* node, Bid bid);
     void inOrder(Node* node);
     Node* removeNode(Node* node, string bidId);
+
+    //helper pointers
+    Node* prevNode = nullptr;
+    Node* currNode = nullptr;
+    Node* anchorNode = nullptr;
 
 public:
     BinarySearchTree();
     virtual ~BinarySearchTree();
     void InOrder();
     void Insert(Bid bid);
-    void Remove(string bidId);
+    void Remove(Node* node, string bidId);
     Bid Search(string bidId);
 };
 
@@ -84,22 +104,183 @@ void BinarySearchTree::InOrder() {
  * Insert a bid
  */
 void BinarySearchTree::Insert(Bid bid) {
-    // FIXME (2a) Implement inserting a bid into the tree
+    // FIXME (2a) DONE: Implement inserting a bid into the tree
+
+    //if the tree is empty
+    if (this->root == nullptr) {
+        this->root = new Node;
+        addNode(this->root, bid);
+    }
+    else {
+        //set current node to root so that we can traverse the tree
+        this->currNode = this->root;
+
+        while (currNode != nullptr) {
+
+            //logic for navigating left branch (less than)
+            if (bid.bidId <= this->currNode->bid.bidId) {
+                if (this->currNode->leftNode == nullptr) {
+                    this->currNode->leftNode = new Node;
+                    addNode(this->currNode->leftNode, bid);
+                    break;
+                }
+                else {
+                    this->currNode = currNode->leftNode;
+                }
+            }
+
+            //logic for navigating right branch (greater than)
+            else if (bid.bidId > this->currNode->bid.bidId) {
+                if (this->currNode->rightNode == nullptr) {
+                    this->currNode->rightNode = new Node;
+                    addNode(this->currNode->rightNode, bid);
+                    break;
+                }
+                else {
+                    this->currNode = currNode->rightNode;
+                }
+            }
+        }
+    }
+    currNode = nullptr;
 }
 
 /**
  * Remove a bid
  */
-void BinarySearchTree::Remove(string bidId) {
-    // FIXME (4a) Implement removing a bid from the tree
+//I changed this function to take a pointer argument so that the function can be called recursively at a
+//node that isn't the root node. This allows the function to be used when deleting a node with two child nodes.
+void BinarySearchTree::Remove(Node* passedNode, string bidId) {
+    // FIXME (4a) DONE: Implement removing a bid from the tree
+
+    //logic for differentiating between recursive call or normal call
+    if (passedNode == nullptr) {
+        this->anchorNode = this->root;
+        this->prevNode = this->root;
+        this->currNode = this->root;
+    }
+    else {
+        this->anchorNode = passedNode;
+        this->prevNode = passedNode;
+        this->currNode = passedNode;
+    }
+
+    //find the bid and delete
+    while (currNode != nullptr) {
+        if (currNode->bid.bidId == bidId){
+            anchorNode = currNode;
+
+            //logic for deleting a leaf
+            if (currNode->leftNode == nullptr && currNode->rightNode == nullptr) {
+                if (prevNode->leftNode == currNode) {           //delete a left leaf
+                    cout << prevNode->leftNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->leftNode;
+                    prevNode->leftNode = nullptr;
+                }
+                else if (prevNode->rightNode == currNode) {     //delete a right leaf
+                    cout << prevNode->rightNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->rightNode;
+                    prevNode->rightNode = nullptr;
+                }
+            }
+
+            //logic for deleting an internal node with only a LEFT child
+            else if (currNode->leftNode != nullptr && currNode->rightNode == nullptr) {
+                currNode = currNode->leftNode;
+                if (prevNode->leftNode == anchorNode) {         //delete a left successor
+                    cout << prevNode->leftNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->leftNode;
+                    prevNode->leftNode = currNode;
+                }
+                else if (prevNode->rightNode == anchorNode) {   //delete a right successor
+                    cout << prevNode->rightNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->rightNode;
+                    prevNode->rightNode = currNode;
+                }
+            }
+
+            //logic for deleting an internal node with only a RIGHT child
+            else if (currNode->leftNode == nullptr && currNode->rightNode != nullptr) {
+                currNode = currNode->rightNode;
+                if (prevNode->leftNode == anchorNode) {         //delete a left successor
+                    cout << prevNode->leftNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->leftNode;
+                    prevNode->leftNode = currNode;
+                }
+                else if (prevNode->rightNode == anchorNode) {   //delete a right successor
+                    cout << prevNode->rightNode->bid.bidId << " has been deleted!" << endl;
+                    delete prevNode->rightNode;
+                    prevNode->rightNode = currNode;
+                }
+            }
+
+            //logic for deleting an internal node with both a right and left child
+            else if (currNode->leftNode != nullptr && currNode->rightNode != nullptr) {
+                currNode = currNode->rightNode;
+                while (currNode->leftNode != nullptr) {
+                    currNode = currNode->leftNode;
+                }
+
+                //sets the anchor node to the current node
+                addNode(anchorNode, currNode->bid);
+
+                //call Remove() recursively with specification on where to begin search for the node/bid to delete
+                Remove(anchorNode->rightNode, currNode->bid.bidId);
+            }
+            break;
+        }
+
+        //navigate the tree LEFT
+        else if (bidId < currNode->bid.bidId) {
+            prevNode = currNode;
+            currNode = currNode->leftNode;
+        }
+
+        //navigate the tree RIGHT
+        else if (bidId > currNode->bid.bidId) {
+            prevNode = currNode;
+            currNode = currNode->rightNode;
+        }
+    }
+
+    //output for if the bidID isn't in the tree
+    if (currNode == nullptr) {
+        cout << bidId << " not found!" << endl;
+    }
+
+    //reset helper pointers to null
+    this->anchorNode = nullptr;
+    this->prevNode = nullptr;
+    this->currNode = nullptr;
 }
 
 /**
  * Search for a bid
  */
 Bid BinarySearchTree::Search(string bidId) {
-    // FIXME (3) Implement searching the tree for a bid
+    // FIXME (3) DONE: Implement searching the tree for a bid
 
+    this->currNode = this->root;
+
+    while (currNode != nullptr) {
+
+        //return the bid when found
+        if (currNode->bid.bidId == bidId) {
+            return currNode->bid;
+        }
+
+        //navigate the tree LEFT
+        else if (bidId < currNode->bid.bidId) {
+                currNode = currNode->leftNode;
+        }
+        //navigate the tree RIGHT
+        else if (bidId > currNode->bid.bidId) {
+                currNode = currNode->rightNode;
+        }
+    }
+
+    //reset currNode and return empty bid;
+    currNode = nullptr;
 	Bid bid;
     return bid;
 }
@@ -111,7 +292,9 @@ Bid BinarySearchTree::Search(string bidId) {
  * @param bid Bid to be added
  */
 void BinarySearchTree::addNode(Node* node, Bid bid) {
-    // FIXME (2b) Implement inserting a bid into the tree
+    // FIXME (2b) DONE: Implement inserting a bid into the tree
+
+    node->bid = bid;
 }
 void BinarySearchTree::inOrder(Node* node) {
 }
@@ -201,6 +384,7 @@ int main(int argc, char* argv[]) {
         break;
     default:
         csvPath = "eBid_Monthly_Sales_Dec_2016.csv";
+        //csvPath = "eBid_Monthly_Sales_Dec_2016_debug.csv";    //debug csv with fewer values
         bidKey = "98109";
     }
 
@@ -247,6 +431,12 @@ int main(int argc, char* argv[]) {
             break;
 
         case 3:
+/*
+            //for debug/testing purposes
+            cout << "Enter bid ID: ";
+            cin >> bidKey;
+*/
+
             ticks = clock();
 
             bid = bst->Search(bidKey);
@@ -265,7 +455,13 @@ int main(int argc, char* argv[]) {
             break;
 
         case 4:
-            bst->Remove(bidKey);
+/*
+            //for debug/testing purposes
+            cout << "Enter bid ID: ";
+            cin >> bidKey;
+*/
+
+            bst->Remove(nullptr, bidKey);
             break;
         }
     }
